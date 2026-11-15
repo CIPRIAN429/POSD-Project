@@ -1,0 +1,27 @@
+sequenceDiagram
+    autonumber
+    actor Browser
+    participant Web as Django · enforcement
+    participant DB as PostgreSQL
+    participant Policy as FastAPI · decision
+    participant Files as Private PDF volume
+    Browser->>Web: GET a protected PDF · authenticated session
+    Web->>DB: Load material, course and current user's enrollment
+    DB-->>Web: Trusted organization, owner, state and membership
+    Web->>Policy: POST /authorize · material_read · X-API-Key
+    Note over Web,Policy: Subject and context come from Django, not browser claims
+    alt Policy replies with allow
+        Policy-->>Web: allowed=true · reason · matched_rules · version
+        Web->>DB: AuditEvent ACCESS · allowed=true
+        Web->>Files: Open the private file
+        Files-->>Web: PDF stream, if the file exists
+        Web-->>Browser: 200 PDF · private, no-store
+    else Policy replies with deny
+        Policy-->>Web: allowed=false · reason · version
+        Web->>DB: AuditEvent ACCESS · allowed=false
+        Web-->>Browser: 403 same organization / 404 different organization
+    else Policy timeout, HTTP error or malformed decision
+        Note over Web,Policy: No valid allow decision is available
+        Web->>DB: AuditEvent ACCESS · POLICY_UNAVAILABLE
+        Web-->>Browser: 503 temporary unavailability · no PDF opened
+    end

@@ -18,6 +18,8 @@ Every allowed action requires an active account and the same organization as the
 
 The platform superadministrator is a separate technical account for Django Admin. It is not an additional course-application role.
 
+For a visual walkthrough, see [roles and pages](visual-guide.md#2-roles-and-pages), [authorization and audit](visual-guide.md#4-authorization-and-audit) and the [course lifecycle](visual-guide.md#7-course-lifecycle).
+
 ## Named policy gates
 
 | Policy ID | Question answered |

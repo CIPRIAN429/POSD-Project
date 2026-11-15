@@ -6,6 +6,12 @@ All application text, demo courses and teaching materials are in English. This i
 
 ![Course catalog](docs/screenshots/catalog-desktop-v2.jpg)
 
+## Understand the project
+
+New to the codebase? Start with [How Access Granted works](docs/visual-guide.md), a visual guide with seven diagrams, examples and links to the implementation. It covers the containers, roles and pages, data model, authorization and audit, enrollment states, concurrent seat allocation and course lifecycle. The SVG images open on GitHub or locally; editable Mermaid sources are included.
+
+For everyday use, follow the [User guide](docs/user-guide.md). For technical details, read the [architecture notes](docs/architecture.md) and [permission matrix](docs/permissions.md).
+
 ## Start from WSL
 
 The project lives at `D:\An_2\PoSD\Proiect`, available inside WSL as `/mnt/d/An_2/PoSD/Proiect`.
@@ -116,6 +122,7 @@ The application is configured for a localhost demonstration. An internet deploym
 ## Reading and handoff
 
 - [User guide: menus, roles and workflows](docs/user-guide.md)
+- [Visual guide: seven diagrams with code references](docs/visual-guide.md)
 - [Architecture and API contract](docs/architecture.md)
 - [Initial-version validation results](docs/validation.md)
 - [Permission matrix and policy behavior](docs/permissions.md)

@@ -2,16 +2,13 @@
 
 Access Granted has three permanent services: a Django web application, a stateless FastAPI policy service, and PostgreSQL. The browser reaches Django only. All content is English; stored timestamps use timezone-aware datetimes and display using Europe/Bucharest.
 
-```mermaid
-flowchart LR
-  Browser -->|HTTP session + CSRF| Django
-  Django -->|Trusted attributes + internal API key| Policy[FastAPI policy evaluator]
-  Policy -->|Allow or deny + reason| Django
-  Django -->|Queries and transactions| DB[(PostgreSQL)]
-  Django -->|Authorized file delivery| Files[Private media volume]
-```
+![Architecture: browser, Django, internal FastAPI evaluator, PostgreSQL and persistent volumes.](diagrams/01-architecture.svg)
+
+See the [visual guide](visual-guide.md) for a step-by-step explanation, role navigation, an entity relationship diagram and request/state sequences. The [Mermaid source](diagrams/01-architecture.mmd) is editable.
 
 ## Request and trust boundaries
+
+The [PDF authorization sequence](visual-guide.md#4-authorization-and-audit) illustrates the allow, deny and policy-unavailable paths, including audit events.
 
 1. Django authenticates the session and loads the current user.
 2. The view resolves the target resource and organization. List queries and form choices are organization-scoped.
@@ -26,6 +23,8 @@ No authorization decision cache is used. Role changes are effective for subseque
 
 ## Data model
 
+The [entity relationship diagram](visual-guide.md#3-data-model) shows the core relationships and cardinality; the table below summarizes their constraints.
+
 | Model | Main relationships and constraints |
 |---|---|
 | Organization | Unique slug; owns users and courses |
@@ -39,6 +38,8 @@ No authorization decision cache is used. Role changes are effective for subseque
 Prerequisites cannot refer to the course itself, another organization or a dependency cycle. An instructor must belong to the course's organization. Form and domain validation protect these rules in the application; arbitrary direct database writes are outside the application's API.
 
 ## Enrollment consistency
+
+Follow the [enrollment state diagram](visual-guide.md#5-enrollment-states) and [two-request last-seat sequence](visual-guide.md#6-two-requests-for-one-seat) alongside this section.
 
 Enrollment, withdrawal, completion, archival and other occupancy-changing operations lock the same course row with `SELECT ... FOR UPDATE` inside an atomic PostgreSQL transaction. Under this convention, requests for one course serialize across Django workers. They then read the active enrollment count and perform the transition before releasing the lock.
 

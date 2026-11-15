@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    participant A as Request A · Django worker
+    participant DB as PostgreSQL · same course row
+    participant B as Request B · Django worker
+    Note over A,B: Both authorized and eligible · capacity 1 · no enrolled students or older waiters
+    A->>DB: BEGIN · SELECT course FOR UPDATE
+    DB-->>A: Row lock acquired
+    B->>DB: BEGIN · SELECT the same course FOR UPDATE
+    Note over DB,B: B waits while A holds the lock
+    A->>DB: Check eligibility and count active enrollments
+    DB-->>A: Active count = 0
+    A->>DB: Save A as ENROLLED and write CHANGE event
+    A->>DB: COMMIT · release the lock
+    DB-->>B: Row lock acquired after A commits
+    B->>DB: Check eligibility and count active enrollments
+    DB-->>B: Active count = 1
+    B->>DB: Save B as WAITLISTED and write CHANGE event
+    B->>DB: COMMIT · release the lock
+    Note over A,B: One enrolled student · one waiting student · capacity remains 1

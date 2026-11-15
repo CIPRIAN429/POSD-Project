@@ -1,0 +1,14 @@
+stateDiagram-v2
+    direction TB
+    [*] --> DRAFT: Create as draft
+    [*] --> PUBLISHED: Create as published
+    DRAFT --> PUBLISHED: Publish in the course form
+    PUBLISHED --> DRAFT: Only if all enrollment records are cancelled or absent
+    DRAFT --> ARCHIVED: Explicit Archive action
+    PUBLISHED --> ARCHIVED: Explicit Archive action
+    note right of ARCHIVED
+        Read-only course and materials
+        No new enrollment or promotion
+        Waitlist entries become CANCELLED
+        Existing ENROLLED and COMPLETED access remains
+    end note

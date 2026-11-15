@@ -1,0 +1,11 @@
+stateDiagram-v2
+    direction TB
+    state admission <<choice>>
+    [*] --> admission: Eligible enrollment request
+    admission --> ENROLLED: Seat available after older eligible waiters
+    admission --> WAITLISTED: No seat available
+    WAITLISTED --> ENROLLED: Promotion while course is published
+    WAITLISTED --> CANCELLED: Student withdraws or course is archived
+    ENROLLED --> CANCELLED: Student withdraws
+    ENROLLED --> COMPLETED: Authorized manager records completion
+    CANCELLED --> admission: Reapply with a new queue timestamp

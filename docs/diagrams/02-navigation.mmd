@@ -1,0 +1,22 @@
+flowchart LR
+    Account["Organization account<br/>One organization · one role"]
+    Common["All three roles<br/>Dashboard · Course catalog · Course details"]
+    Student["Student"]
+    Instructor["Instructor"]
+    Admin["Organization Administrator"]
+    Learning["My courses<br/>Enroll · withdraw · read authorized materials"]
+    Teaching["Manage courses<br/>Course forms · materials · participants · completion"]
+    Organization["Organization users<br/>Access policies · Audit log"]
+    Guide["User guide<br/>Public · also available before sign-in"]
+    Super["Technical superadministrator"]
+    Console["Django Admin<br/>Platform organizations and technical administration"]
+    Account --> Common
+    Account --> Student
+    Account --> Instructor
+    Account --> Admin
+    Student --> Learning
+    Instructor -->|"Assigned courses only"| Teaching
+    Admin -->|"All courses in own organization"| Teaching
+    Admin --> Organization
+    Account -.-> Guide
+    Super --> Console

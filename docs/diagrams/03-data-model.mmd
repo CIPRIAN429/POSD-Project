@@ -1,0 +1,61 @@
+erDiagram
+    Organization o|--o{ User : "membership"
+    Organization ||--o{ Course : "owns"
+    Organization ||--o{ AuditEvent : "scopes"
+    User ||--o{ Course : "assigned instructor"
+    User ||--o{ Enrollment : "student"
+    Course ||--o{ Enrollment : "has"
+    Course ||--o{ Material : "contains"
+    User o|--o{ AuditEvent : "actor"
+    Course }o--o{ Course : "requires (directed)"
+
+    Organization {
+        bigint id PK
+        string name
+        string slug UK
+    }
+    User {
+        bigint id PK
+        bigint organization_id FK
+        string username UK
+        string role
+        boolean is_active
+    }
+    Course {
+        bigint id PK
+        bigint organization_id FK
+        bigint instructor_id FK
+        string title
+        int capacity
+        string status
+    }
+    Material {
+        bigint id PK
+        bigint course_id FK
+        string title
+        string kind
+        string pdf_file
+        int position
+    }
+    Enrollment {
+        bigint id PK
+        bigint course_id FK
+        bigint student_id FK
+        string status
+        datetime queue_entered_at
+        datetime completed_at
+    }
+    AuditEvent {
+        bigint id PK
+        bigint organization_id FK
+        bigint actor_id FK
+        string actor_name
+        string action
+        string resource_type
+        bigint resource_id
+        string event_type
+        boolean allowed
+        string reason
+        string policy_version
+        datetime created_at
+    }

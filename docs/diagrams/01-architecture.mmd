@@ -1,0 +1,16 @@
+flowchart TB
+    Browser["Browser<br/>Sign in and use the course platform"]
+    subgraph Stack["Docker Compose · internal service network"]
+        Web["Django · web<br/>Pages, sessions, forms and enforcement"]
+        Policy["FastAPI · policy<br/>RBAC + ABAC decisions · no stored state"]
+        DB[("PostgreSQL · db<br/>Users, courses, enrollments and audit")]
+        Media[("Private media volume<br/>Uploaded and generated PDFs")]
+        Data[("PostgreSQL data volume")]
+        Web -->|"HTTP · trusted attributes + X-API-Key"| Policy
+        Policy -->|"Allow / deny · reason · policy version"| Web
+        Web -->|"ORM queries and transactions"| DB
+        Web -->|"Read only after authorization"| Media
+        DB --- Data
+    end
+    Browser -->|"localhost:8000 · HTTP session + CSRF"| Web
+    Web -->|"HTML, static assets or protected PDF"| Browser
