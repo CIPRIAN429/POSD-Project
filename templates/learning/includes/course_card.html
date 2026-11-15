@@ -1,0 +1,9 @@
+<article class="course-card">
+  <div class="course-card-header"><span class="course-code">Course {{ course.pk|stringformat:'03d' }}</span><span class="status-badge status-{{ course.status|lower }}">{{ course.get_status_display }}</span></div>
+  <div class="course-card-content">
+    <h3><a href="{% url 'learning:course_detail' course.pk %}">{{ course.title }}</a></h3>
+    <p>{{ course.description|truncatechars:180 }}</p>
+    <div class="course-instructor">{{ course.instructor.get_full_name|default:course.instructor.username }}</div>
+    <div class="course-card-footer"><span><strong>{{ course.active_count|default:0 }}</strong> / {{ course.capacity }} place{{ course.capacity|pluralize }} filled</span><a href="{% url 'learning:course_detail' course.pk %}" class="text-link" aria-label="View {{ course.title }}">View course <span aria-hidden="true">→</span></a></div>
+  </div>
+</article>

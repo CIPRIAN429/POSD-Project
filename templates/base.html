@@ -1,0 +1,64 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#192e38">
+  <title>{% block title %}Overview{% endblock %} · Access Granted</title>
+  <link rel="icon" href="{% static 'brand/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body class="{% if user.is_authenticated %}app-body{% else %}auth-body{% endif %}">
+<a class="skip-link" href="#main-content">Skip to content</a>
+{% if user.is_authenticated %}
+<aside class="sidebar" id="app-navigation" aria-label="Main navigation">
+  <div class="sidebar-heading">
+    <a class="brand" href="{% url 'learning:dashboard' %}"><span class="brand-mark" aria-hidden="true">ag</span><span>Access<br>Granted</span></a>
+    <button class="nav-close" type="button" aria-label="Close navigation" data-nav-close>{% include 'learning/includes/icon.html' with name='close' %}</button>
+  </div>
+  <div class="workspace-label">Organization</div>
+  <div class="workspace-name">{{ user.organization.name|default:'Platform administration' }}</div>
+  {% with current=request.resolver_match.url_name %}
+  <nav class="main-nav">
+    <a href="{% url 'learning:dashboard' %}" class="nav-link {% if current == 'dashboard' %}active{% endif %}" {% if current == 'dashboard' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='overview' %}Overview</a>
+    <a href="{% url 'learning:catalog' %}" class="nav-link {% if current == 'catalog' or current == 'course_detail' or current == 'material_detail' %}active{% endif %}" {% if current == 'catalog' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='catalog' %}Course catalog</a>
+    {% if user.role == 'STUDENT' %}<a href="{% url 'learning:my_courses' %}" class="nav-link {% if current == 'my_courses' %}active{% endif %}" {% if current == 'my_courses' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='bookmark' %}My courses</a>{% endif %}
+    {% if user.role == 'INSTRUCTOR' or user.role == 'ADMIN' %}
+    <div class="nav-section">Administration</div>
+    <a href="{% url 'learning:manage_courses' %}" class="nav-link {% if current == 'manage_courses' or current == 'course_create' or current == 'course_edit' or current == 'participants' or current == 'material_create' or current == 'material_edit' %}active{% endif %}" {% if current == 'manage_courses' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='edit' %}Manage courses</a>
+    {% endif %}
+    {% if user.role == 'ADMIN' %}
+    <a href="{% url 'learning:user_list' %}" class="nav-link {% if current == 'user_list' or current == 'user_create' or current == 'user_edit' %}active{% endif %}" {% if current == 'user_list' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='users' %}Organization users</a>
+    <a href="{% url 'learning:policies' %}" class="nav-link {% if current == 'policies' %}active{% endif %}" {% if current == 'policies' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='shield' %}Access policies</a>
+    <a href="{% url 'learning:audit' %}" class="nav-link {% if current == 'audit' %}active{% endif %}" {% if current == 'audit' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='history' %}Audit log</a>
+    {% endif %}
+    {% if user.is_superuser %}<a class="nav-link" href="/admin/">{% include 'learning/includes/icon.html' with name='settings' %}System administration</a>{% endif %}
+    <div class="nav-section">Reference</div>
+    <a href="{% url 'learning:guide' %}" class="nav-link {% if current == 'guide' %}active{% endif %}" {% if current == 'guide' %}aria-current="page"{% endif %}>{% include 'learning/includes/icon.html' with name='guide' %}User guide</a>
+  </nav>
+  {% endwith %}
+  <div class="sidebar-bottom">
+    <div class="user-box"><span class="avatar">{{ user.first_name|first|default:user.username|first|upper }}</span><div class="user-info"><strong>{{ user.get_full_name|default:user.username }}</strong><span>{{ user.get_role_display }}</span></div></div>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="signout-button" type="submit">Sign out {% include 'learning/includes/icon.html' with name='logout' %}</button></form>
+  </div>
+</aside>
+<button class="nav-backdrop" type="button" aria-label="Close navigation" data-nav-close hidden></button>
+<div class="main-shell">
+  <header class="topbar">
+    <div class="topbar-left"><button class="nav-toggle" type="button" aria-controls="app-navigation" aria-expanded="false" hidden>{% include 'learning/includes/icon.html' with name='menu' %}<span>Menu</span></button><span class="topbar-section">{{ user.organization.name|default:'Platform administration' }}</span></div>
+    <a class="header-guide" aria-label="User guide" href="{% url 'learning:guide' %}">{% include 'learning/includes/icon.html' with name='guide' %}<span>User guide</span></a>
+  </header>
+  <main id="main-content" class="main-content">
+{% else %}<main id="main-content" class="auth-main">{% endif %}
+  {% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+  </main>
+{% if user.is_authenticated %}<footer class="app-footer"><span>Access Granted / Course administration</span><a href="{% url 'learning:guide' %}#troubleshooting">Help & troubleshooting</a></footer></div>{% endif %}
+<dialog id="confirmation-dialog" class="confirm-dialog" aria-labelledby="confirmation-title">
+  <form method="dialog"><h2 id="confirmation-title">Confirm action</h2><p data-confirm-message></p><div class="form-actions"><button class="btn btn-outline-secondary" value="cancel" autofocus>Cancel</button><button class="btn btn-primary" value="confirm">Confirm</button></div></form>
+</dialog>
+</body>
+</html>

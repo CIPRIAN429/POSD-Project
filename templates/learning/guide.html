@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}User guide{% endblock %}
+{% block content %}
+<div class="guide-page">
+  {% if not user.is_authenticated %}<a class="back-link" href="{% url 'login' %}">← Back to sign in</a>{% endif %}
+  <div class="page-heading"><div><div class="eyebrow">REFERENCE</div><h1>User guide</h1><p>{{ guide.description }}</p></div></div>
+  <div class="guide-tools">
+    <div class="guide-search" data-guide-enhancement hidden><label for="guide-search">Search the guide</label><div class="search-group"><input class="form-control" id="guide-search" type="search" placeholder="Try prerequisites or waitlist" autocomplete="off"><button class="btn btn-outline-secondary" type="button" data-guide-clear>Clear search</button></div></div>
+    <div class="button-group"><a class="btn btn-outline-secondary" href="{% url 'learning:guide_download' %}">Download guide</a><button class="btn btn-outline-secondary" type="button" data-guide-print data-guide-enhancement hidden>Print guide</button></div>
+  </div>
+  <p class="guide-count" id="guide-result-count" role="status" aria-live="polite" data-guide-enhancement hidden></p>
+  <div class="guide-layout">
+    <details class="guide-toc" open><summary>Contents</summary><ol>{% for section in guide.sections %}<li data-guide-target="{{ section.slug }}"><a href="#{{ section.slug }}"><span>{{ forloop.counter|stringformat:'02d' }}</span>{{ section.title }}</a></li>{% endfor %}</ol></details>
+    <div class="guide-sections">
+      <div class="guide-no-results" hidden><h2>No matching sections</h2><p>Try a shorter search, or select Clear search to show the complete guide.</p></div>
+      {% for section in guide.sections %}
+      <section class="guide-section" id="{{ section.slug }}" aria-labelledby="{{ section.slug }}-title">
+        <div class="eyebrow">{{ forloop.counter|stringformat:'02d' }} / {{ section.audience }}</div><h2 id="{{ section.slug }}-title">{{ section.title }}</h2>
+        {% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+        {% if section.steps %}<ol>{% for step in section.steps %}<li>{{ step }}</li>{% endfor %}</ol>{% endif %}
+        {% if section.table_rows %}<table class="guide-table"><thead><tr>{% for column in section.columns %}<th scope="col">{{ column }}</th>{% endfor %}</tr></thead><tbody>{% for row in section.table_rows %}<tr>{% for cell in row %}<td data-label="{{ cell.label }}">{{ cell.value }}</td>{% endfor %}</tr>{% endfor %}</tbody></table>{% endif %}
+        {% if section.bullets %}<ul>{% for bullet in section.bullets %}<li>{{ bullet }}</li>{% endfor %}</ul>{% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

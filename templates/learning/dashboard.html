@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">{{ user.get_role_display }}</span><h1>Course overview</h1><p>{% if user.role == 'STUDENT' %}Your enrollments and courses available at {{ user.organization.name }}.{% elif user.role == 'INSTRUCTOR' %}Enrollment activity for the courses you teach.{% else %}Courses and enrollment activity across {{ user.organization.name }}.{% endif %}</p></div><a class="btn btn-primary" href="{% if user.role == 'STUDENT' %}{% url 'learning:my_courses' %}{% else %}{% url 'learning:manage_courses' %}{% endif %}">{% if user.role == 'STUDENT' %}My courses{% else %}Manage courses{% endif %}</a></div>
+<div class="stats-grid">
+  <article class="stat-card"><span class="stat-label">Catalog courses</span><strong>{{ stats.courses|default:0 }}</strong><span class="stat-caption">Visible to your account</span></article>
+  <article class="stat-card"><span class="stat-label">Active enrollments</span><strong>{{ stats.enrolled|default:0 }}</strong><span class="stat-caption">Currently occupying a place</span></article>
+  <article class="stat-card"><span class="stat-label">Completed</span><strong>{{ stats.completed|default:0 }}</strong><span class="stat-caption">Materials remain available</span></article>
+  <article class="stat-card"><span class="stat-label">Waitlisted</span><strong>{{ stats.waiting|default:0 }}</strong><span class="stat-caption">Waiting for an available place</span></article>
+</div>
+{% if recent_enrollments %}
+<section class="section-block"><div class="section-heading"><h2>{% if user.role == 'STUDENT' %}Recent enrollments{% else %}Recent enrollment activity{% endif %}</h2><span class="section-note">Most recently updated</span></div><div class="panel">{% for enrollment in recent_enrollments %}<div class="activity-row"><span class="record-number" aria-hidden="true">{{ forloop.counter|stringformat:'02d' }}</span><div class="activity-main"><a href="{% url 'learning:course_detail' enrollment.course.pk %}">{{ enrollment.course.title }}</a><p>{% if user.role != 'STUDENT' %}{{ enrollment.student.get_full_name|default:enrollment.student.username }} · {% endif %}Updated {{ enrollment.updated_at|date:'M j, Y' }}</p></div><span class="status-badge status-{{ enrollment.status|lower }}">{{ enrollment.get_status_display }}</span></div>{% endfor %}</div></section>
+{% endif %}
+<section class="section-block"><div class="section-heading"><h2>In the catalog</h2><a class="text-link" href="{% url 'learning:catalog' %}">All courses <span aria-hidden="true">→</span></a></div><div class="course-grid">{% for course in featured_courses %}{% include 'learning/includes/course_card.html' %}{% empty %}<div class="empty-state full-width"><h3>No courses available</h3><p>Published courses will appear here.</p></div>{% endfor %}</div></section>
+<aside class="guide-callout"><div><strong>Course access and enrollment rules</strong><p>See what each status means, how places are allocated and which actions your role allows.</p></div><a class="text-link" href="{% url 'learning:guide' %}">Read the user guide →</a></aside>
+{% endblock %}

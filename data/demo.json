@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "provenance": "Original synthetic teaching data created for Access Granted. All people, organizations and course descriptions are fictional.",
+  "organizations": [
+    {
+      "name": "Atlas University", "slug": "atlas",
+      "users": [
+        {"suffix": "admin", "first_name": "Avery", "last_name": "Morgan", "role": "ADMIN"},
+        {"suffix": "instructor", "first_name": "Jordan", "last_name": "Reed", "role": "INSTRUCTOR"},
+        {"suffix": "student1", "first_name": "Alex", "last_name": "Taylor", "role": "STUDENT"},
+        {"suffix": "student2", "first_name": "Sam", "last_name": "Rivera", "role": "STUDENT"},
+        {"suffix": "student3", "first_name": "Casey", "last_name": "Brooks", "role": "STUDENT"}
+      ],
+      "courses": [
+        {
+          "key": "atlas-python", "title": "Python Foundations",
+          "description": "Build confidence with Python functions, collections and small programs. This introductory course prepares you for the Distributed Systems Lab.",
+          "capacity": 12, "prerequisites": [],
+          "objective": "Describe a small Python interface and choose collections for course data.",
+          "exercise": "Write an available_seats function and test empty and full courses. Explain why a seat count displayed in a browser may become stale.",
+          "lessons": [
+            {"title": "Functions and clear interfaces", "body": "A function groups an operation behind a named interface. Give each function a focused purpose, name its inputs clearly and make its result predictable.\n\nWrite a function named available_seats(capacity, enrolled) that returns the number of free seats, never below zero. Try an empty course, a full course and an invalid count.\n\nIn this platform, the web application and policy service also communicate through explicit interfaces. A clear contract makes separate components easier to test."},
+            {"title": "Collections and application state", "body": "Lists preserve order, sets represent unique membership, and dictionaries map keys to values. Choose a collection according to the question the program needs to answer.\n\nModel a course with a title, a set of completed prerequisites and an ordered waitlist. Explain why an unordered set alone cannot represent a queue.\n\nPersistent application state belongs in the database. Python objects held by one process are not automatically shared by other web workers."}
+          ]
+        },
+        {
+          "key": "atlas-distributed", "title": "Distributed Systems Lab",
+          "description": "Explore service boundaries, HTTP contracts and failure handling through practical experiments. Complete Python Foundations before enrolling.",
+          "capacity": 8, "prerequisites": ["atlas-python"],
+          "objective": "Trace authorization across services and explain behavior during an outage.",
+          "exercise": "Stop the policy service, request a protected resource, then restart it and retry. Record expected and observed behavior at each step.",
+          "lessons": [
+            {"title": "Requests across a service boundary", "body": "A remote call may succeed, fail or take too long. The caller needs an explicit timeout and a response for each outcome.\n\nTrace one material request from the browser to Django, from Django to the policy service, and back. Mark where the decision is enforced.\n\nThe policy service evaluates trusted attributes collected by Django. Students cannot supply their own role or organization as authoritative facts."},
+            {"title": "Failing closed", "body": "A protected operation proceeds only when authorization explicitly succeeds. If the evaluator is unavailable, the platform reports a temporary error and does not perform the operation.\n\nStop the policy container, attempt a protected action, and restart it. Observe the failure and recovery without changing code.\n\nThis design trades some availability for an access-control guarantee. This demonstration does not implement global replication or consensus."}
+          ]
+        },
+        {
+          "key": "atlas-concurrency", "title": "Concurrency Workshop",
+          "description": "A one-seat workshop for demonstrating concurrent enrollment, waiting lists and automatic promotion. No prerequisites are required.",
+          "capacity": 1, "prerequisites": [],
+          "objective": "Verify capacity and queue behavior using independent student sessions.",
+          "exercise": "Enroll one student and queue a second. Withdraw the first and verify promotion. Repeat with simultaneous requests using the automated concurrency test.",
+          "lessons": [
+            {"title": "The last-seat problem", "body": "Two students may read that one place remains before either has enrolled. A separate read followed by a write can allow both to claim that place.\n\nThe application locks the course row inside a transaction before counting active enrollments. Every operation that changes occupancy follows the same locking convention.\n\nStart two enrollment requests together. Confirm that one becomes enrolled and the other enters the waitlist."},
+            {"title": "Fair promotion", "body": "A waitlist is ordered by joining time, with a stable identifier used to break ties. Rejoining after withdrawal creates a new position.\n\nWhen a place opens, the first currently eligible student is promoted. Disabled accounts or unmet prerequisites must not bypass eligibility checks.\n\nEnroll one student, queue a second, withdraw the first, and verify that the second can open this material. A passing example does not prove every possible concurrent schedule."}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nova Academy", "slug": "nova",
+      "users": [
+        {"suffix": "admin", "first_name": "Riley", "last_name": "Parker", "role": "ADMIN"},
+        {"suffix": "instructor", "first_name": "Jamie", "last_name": "Chen", "role": "INSTRUCTOR"},
+        {"suffix": "student1", "first_name": "Drew", "last_name": "Hayes", "role": "STUDENT"},
+        {"suffix": "student2", "first_name": "Robin", "last_name": "Lane", "role": "STUDENT"},
+        {"suffix": "student3", "first_name": "Taylor", "last_name": "Quinn", "role": "STUDENT"}
+      ],
+      "courses": [
+        {
+          "key": "nova-security", "title": "Security Essentials",
+          "description": "Learn the difference between authentication and authorization, and connect roles to everyday application actions.",
+          "capacity": 12, "prerequisites": [],
+          "objective": "Separate identity from authorization and describe a role plus attribute check.",
+          "exercise": "Create a permission matrix for students, instructors and administrators. Add organization and ownership conditions to demonstrate where roles alone are insufficient.",
+          "lessons": [
+            {"title": "Identity and permission", "body": "Authentication establishes who makes a request. Authorization determines whether that identity may perform an action on a resource. A successful login does not grant every permission.\n\nList three actions a student can perform and two reserved for an instructor or administrator.\n\nCheck authorization on the server. Hiding a button guides users, but cannot protect its URL by itself."},
+            {"title": "Roles and context", "body": "A role provides a manageable collection of permissions. Attributes add context, such as a course's organization or assigned instructor.\n\nCompare two instructors trying to edit the same course. Their role is identical while the ownership attribute changes the result.\n\nFor every protected action, consider both an allowed example and a denied example."}
+          ]
+        },
+        {
+          "key": "nova-policy", "title": "Policy Design Studio",
+          "description": "Design readable authorization rules and verify them with allow and deny scenarios. Security Essentials is required.",
+          "capacity": 8, "prerequisites": ["nova-security"],
+          "objective": "Design a small attribute-based rule and test its boundary cases.",
+          "exercise": "Vary one attribute at a time: role, organization, ownership, account activity and enrollment. Record the expected result before performing each request.",
+          "lessons": [
+            {"title": "Writing a policy", "body": "A policy connects a subject, action and resource. Conditions compare attributes, such as organization identifiers.\n\nWrite the rule for opening a protected PDF. Require an active account, the same organization and an enrolled or completed status.\n\nUse stable reason codes in programmatic responses and understandable explanations in the interface."},
+            {"title": "Testing the boundary", "body": "Start with a permitted request and change one relevant attribute. Change the organization, owner, role or enrollment state while holding the action constant.\n\nRecord expected decisions before running the application. Confirm that direct URLs follow the same policy as buttons.\n\nAudit records help explain decisions and should only be visible to authorized administrators. Keep conclusions proportional to the scenarios tested."}
+          ]
+        },
+        {
+          "key": "nova-isolation", "title": "Tenant Isolation Workshop",
+          "description": "Investigate organization boundaries and protected downloads in a one-seat workshop with a waiting list.",
+          "capacity": 1, "prerequisites": [],
+          "objective": "Check organization boundaries across pages, forms and private downloads.",
+          "exercise": "Test a course page and PDF link using accounts from both organizations. Compare the permitted request with the denied request and inspect the authorized audit view.",
+          "lessons": [
+            {"title": "Following a resource identifier", "body": "A resource identifier tells the server which record is requested. It does not prove that the requester may access that record.\n\nCopy an Atlas University course address and open it while signed in at Nova Academy. The request must not reveal the other organization's resource.\n\nApply the same reasoning to lists, downloads, participant records and form choices."},
+            {"title": "Private files and evidence", "body": "A private PDF must be served through an authorized endpoint. A public media directory would bypass the policy check.\n\nVerify that an enrolled student can download a handout, then withdraw and try the same link.\n\nReview the authorized audit view to connect the attempted action with its decision. Avoid placing passwords or complete document contents in logs."}
+          ]
+        }
+      ]
+    }
+  ],
+  "enrollments": [
+    {"course": "atlas-python", "student": "atlas.student1", "status": "COMPLETED"},
+    {"course": "atlas-python", "student": "atlas.student2", "status": "ENROLLED"},
+    {"course": "nova-security", "student": "nova.student1", "status": "COMPLETED"},
+    {"course": "nova-security", "student": "nova.student2", "status": "ENROLLED"}
+  ]
+}

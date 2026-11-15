@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}Something Went Wrong{% endblock %}
+{% block content %}<div class="error-page"><span class="error-code" aria-hidden="true">500</span><span class="eyebrow">SERVER ERROR</span><h1>Something went wrong.</h1><p>We couldn't finish loading this page. Please try again in a moment. If the problem continues, contact your organization administrator.</p><a class="btn btn-primary" href="{% url 'login' %}">Back to sign in</a></div>{% endblock %}

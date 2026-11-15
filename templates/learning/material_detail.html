@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}{{ material.title }}{% endblock %}
+{% block content %}
+<a href="{% url 'learning:course_detail' material.course.pk %}" class="back-link">← Back to {{ material.course.title }}</a>
+<div class="page-heading"><div><span class="eyebrow">{{ material.get_kind_display }}</span><h1>{{ material.title }}</h1><p>{{ material.course.title }}</p></div></div>
+<article class="panel lesson-panel">
+{% if material.body %}<div class="lesson-prose">{{ material.body|linebreaks }}</div>{% endif %}
+{% if material.kind == 'PDF' %}<div class="pdf-callout"><span class="pdf-document-icon" aria-hidden="true">PDF</span><div><h2>PDF handout</h2><p>Download a copy of this course document. Access is checked for each download.</p><a href="{% url 'learning:material_download' material.pk %}" class="btn btn-primary">Download PDF <span aria-hidden="true">↓</span></a></div></div>{% endif %}
+<div class="lesson-end"><a class="btn btn-outline-secondary" href="{% url 'learning:course_detail' material.course.pk %}">Back to course materials</a></div>
+</article>
+{% endblock %}
